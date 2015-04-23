@@ -1,4 +1,4 @@
-CFLAGS = 
+CFLAGS = -fopenmp
 
 default: app
 

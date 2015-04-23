@@ -1,0 +1,89 @@
+Environment
+	Ubuntu 14.04 running on VMWare
+
+Original, no changes 
+	Elapsed time: 116.90 seconds
+	Elapsed time: 116.55 seconds
+
+V0 Observations
+	Working from topmost level and finding obvious methods for improvement
+	Looking at main()
+		Nested for loop structure with 3 levels (Loop1, Loop2, Loop3)
+		Use OpenMP to parallelize loops
+
+V1.0, Loop3 parallelized with OpenMP 
+	Elapsed time: 116.62 seconds
+	Elapsed time: 116.73 seconds
+
+V1.1, Loop3 and Loop2 parallelized with OpenMP
+	Elapsed time: 114.73 seconds
+	Elapsed time: 118.51 seconds
+	Elapsed time: 115.07 seconds
+
+V1.2, All loops parallelized with OpenMP
+	Elapsed time: 115.31 seconds
+	Elapsed time: 121.82 seconds
+
+V1.3 Enclose loop block into 'omp parallel'
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 124.53 seconds
+	Elapsed time: 116.99 seconds
+
+V1.4 Switching scheduling of Loop 1 to dynamic
+	number stars: 13497423
+ 	number of SNII: 26344
+ 	number of SNIa: 2825
+ 	total stellar mass: 3833250.74163964
+ 	Sterilization distance multiplier: 1
+ 	Number density type: 1
+
+	Elapsed time: 125.94 seconds
+	Elapsed time: 120.20 seconds
+
+V1.5 Switching scheduling for all loops to dynamic
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 116.60 seconds
+	Elapsed time: 115.89 seconds
+
+V1.6 Remove omp from inner loops
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 115.69 seconds
+	Elapsed time: 123.38 seconds
+
+V1.7 Suspicious of no improvements, attempt to check if omp is functioning properly by calling omp_get_thread_num()
+	Compile error
+	Could not find omp_get_thread_num()
+	OpenMP library not properly loading
+
+V1.8 Added -fopenmp flag to compiler
+	Runtime error
+	Threads now properly print but segmentation fault immediately after
+	Through debugging, was able to pinpoint problem to 'omp parallel' block
+	Limiting threads to 2 and removing omp parallel parameters in an attempt to debug
+
+V1.9 
+
+V1 SUMMARY
+	No real improvements through OpenMp. Could possibly use more tweaking, but will move on to version 2 for now with changes intact. Going to continue going for 'low hanging fruit' first and move on to compiler optimization flags.
+
+===================
+
+V2.0 Compiler Optimizations (0, 1, 2, 3, fast)

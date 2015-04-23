@@ -17,8 +17,6 @@
 #include <sstream>
 #include <stdlib.h>
 #include "SFH/SFH.cpp"
-#include <sys/time.h>               // 432 - timers
-#include <omp.h>                    // 432 - openMP
 
 using namespace std;
 
@@ -88,9 +86,6 @@ using namespace std;
   
   //sterilization distance multiplier
   #define ster_dist_multi 1; //keep this at 1- corresponding to an 8pc normalization to SNII
-
-  // 432
-  #define NUM_THREADS 4
 
 struct subsection_parameters
 {
@@ -256,12 +251,9 @@ CRandomMersenne rg(seed);           // make instance of random number generator
 // Global variable
 float n0;
 
-int main(int argc, char *argv[]) {
-
-    // 432 - Timers
-    struct timeval start, end;
-    double elapsed;
-    gettimeofday(&start, NULL);
+int main(int argc, char *argv[])
+{
+    
    
     int state;
     int num_in_process=0;
@@ -278,8 +270,6 @@ int main(int argc, char *argv[]) {
     float radial_dist_cell_size=subsection_slice_radial_distance;
     float sterilization_multiplier=ster_dist_multi;
 
-    omp_set_num_threads(2);
-
     if (argc != 2) {
       fprintf(stderr,"Usage: %s <n0>\n",argv[0]);
       fprintf(stderr,"    The larger n0 the longer the runtime (default n0 = 5.502)\n");
@@ -293,47 +283,38 @@ int main(int argc, char *argv[]) {
     create_subsections();
     create_columns();
     
+
+    
     cout <<"\n count xy: "<<count_xy_glbl;
     cout <<"\n count z: "<<count_z_glbl;
     cout << "\n number stars: "<<num_stars_glbl;
     cout <<"\n";
     
-    // 432 - Loop 1 - count_xy_glbl
-    //#pragma omp parallel shared(star,column_array,subsect_ptr,count_xy_glbl) private(num_in_process)
-    //{ 
-        
-        // 432 Declare loop variables
-        int l, k;
-        long int j;
+    for (int l=1; l<=count_xy_glbl; l++)
+    {
 
-        //#pragma omp parallel for schedule(dynamic)
-        for (l=1; l<=count_xy_glbl; l++) {
+            
             star = new star_cell [column_array[l]->num_stars+1];
-
-            // 432 - Loop 2 - column_array[l]->cell_max
             //loop that iterates through each cell in the column
-            //#pragma omp for schedule(dynamic)
-            for (j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++) {
-
-                // 432 - Loop 3 - subsect_ptr[j]->num_stars
-                #pragma omp parallel for ordered schedule(static) //private(k)
-                for (k=1; k<=subsect_ptr[j]->num_stars; k++) {
-                    //cout <<"THREAD: "<<omp_get_thread_num();
-                    //cout <<"\n";
-
+            for (long int j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++)
+            {
+                
+                    for (int k=1; k<=subsect_ptr[j]->num_stars; k++)
+                    {
+                
                     star[count].subsection_z=subsect_ptr[j]->subsection_z;
-
+                    
                     star[count].cell=j;
                     //for radial distance in cylindrical coordinates
                     R=random_star_generator_R(subsect_ptr[j]->angle_min,subsect_ptr[j]->angle_max, 
-                        subsect_ptr[j]->radial_distance_min, subsect_ptr[j]->radial_distance_max);
-
+                    subsect_ptr[j]->radial_distance_min, subsect_ptr[j]->radial_distance_max);
+                    
                     degree=degree_generator(subsect_ptr[j]->angle_min, subsect_ptr[j]->angle_max);
                     //set x,y,z coordinates
                     star[count].x_coord=R*(cos(degree*(pi_fn/180)));
                     star[count].y_coord=R*(sin(degree*(pi_fn/180)));
                     star[count].z_coord=random_star_generator_Z(subsect_ptr[j]->z_min,subsect_ptr[j]->z_max);
-
+                    
                     //initialize sterilization value to 0
                     star[count].sterilized=0;
                     //initialize sn value to 0
@@ -344,92 +325,110 @@ int main(int argc, char *argv[]) {
                     star[count].birth_date=generate_birth_date((R/1000),rg.Random());            
                     star[count].ms_lifetime=generate_ms_lifetime(star[count].mass);
                     star[count].death_date=star[count].birth_date+star[count].ms_lifetime;
-
-                    
-
+                                    
                     //determines if a star is a typeII SN, returns 1 if it is a SN
-                    #pragma omp ordered
-                    if ((SN_star(star[count].mass))==1) {
-                        star[count].sn=1; 
-                        //sets the sterilization distance of the SNII
-                        star[count].sterilization_distance=SNII_distance(rg.Random());
-                        
-                        //multiplies the serilization distance by the multiplier for sensitivity analysis
-                        star[count].sterilization_distance*=sterilization_multiplier;
-                        
-                        if (star[count].death_date<=13.24) {  
-                            num_sn_glbl++; 
-
+                    if (
+                    (SN_star(star[count].mass))==1
+                    )
+                    {
+                    star[count].sn=1; 
+                    //sets the sterilization distance of the SNII
+                    star[count].sterilization_distance=SNII_distance(rg.Random());
+                    
+                    //multiplies the serilization distance by the multiplier for sensitivity analysis
+                    star[count].sterilization_distance*=sterilization_multiplier;
+                    
+                    if (star[count].death_date<=13.24)
+                          {  
+                          num_sn_glbl++; 
+                          
                             //calculate some global statistics between 2.5-15kpc
                             //to remove those statistics between 0-2.5kpc
-                            if (l>(int((2500/radial_dist_cell_size))) ) {
-                                num_SNII_specific++; 
-                            }  
-                        }      
+                               if (l>(int((2500/radial_dist_cell_size))) )
+                               {
+                                   num_SNII_specific++; 
+                               }  
+                          }      
+                      
+                  
+                        
                     }
-
+                    
                     //determines if a star will cause a typeIa SN
                     //it will return 2 if it is, and 0 if it isn't
-                    #pragma omp ordered
-                    if ((star[count].mass >=type_Ia_mass_lower_fn)&&(star[count].mass <type_Ia_mass_upper_fn) && (star[count].death_date<=max_time_fn)) {
-                        star[count].sn=type_Ia_candidate();       
-
-                        //if the star is a typeIa SN- set its sterilization distance
-                        if (star[count].sn==2) {
-                            //sets the sterilization distance of the SNIa
-                            star[count].sterilization_distance=SNIa_distance(rg.Random());   
-                            
-                            //multiplies the serilization distance by the multiplier for sensitivity analysis
-                            star[count].sterilization_distance*=sterilization_multiplier;
-
-                            num_sn_Ia_glbl++;    
-
-                            //calculate some global statistics between 2.5-15kpc
-                            //to remove those statistics between 0-2.5kpc
-                            if (l>(int((2500/radial_dist_cell_size))) ) {
-                                num_SNIa_specific++;
-                            }                          
-                        }                                                
-                    }
+                    if (
+                    (star[count].mass >=type_Ia_mass_lower_fn)&&(star[count].mass <type_Ia_mass_upper_fn) && (star[count].death_date<=max_time_fn)
+                    )
+                    {
+                    star[count].sn=type_Ia_candidate();       
                     
+                      //if the star is a typeIa SN- set its sterilization distance
+                      if (star[count].sn==2)
+                      {
+                         //sets the sterilization distance of the SNIa
+                         star[count].sterilization_distance=SNIa_distance(rg.Random());   
+                          //multiplies the serilization distance by the multiplier for sensitivity analysis
+                         star[count].sterilization_distance*=sterilization_multiplier;
+                         
+                          num_sn_Ia_glbl++;    
+                          
+                          //calculate some global statistics between 2.5-15kpc
+                          //to remove those statistics between 0-2.5kpc
+                          if (l>(int((2500/radial_dist_cell_size))) )
+                          {
+                          num_SNIa_specific++;   
+                                  
+                          }                          
 
-                    count++;     
-                } // 432 - end of Loop 3
-
-            } //432 - end of loop 2
-            
-            
-
-            num_in_process++;
-
-            //special case where the first column needs to be populated
-            if (num_in_process==1) {
-                ptr_1_range=count-1; 
-                copy_into_star1(ptr_1_range);           
+                                       
+                      }                                                
+                    }
               
-                //initialize stats array
-                stats = (struct statistics **)realloc(stats, (count_xy_glbl+1) * sizeof(struct statistics *));
-
-                stats_midplane = new statistics [count_z_glbl+1];  
-                stats_radial_mp = new statistics [(count_z_glbl*count_xy_glbl)+1];
-                                                         
-            }
-
-            //need num_in_process2 to populate star2 with star
-            else if (num_in_process==2) {
-                ptr_2_range=count-1;
-                copy_into_star2(ptr_2_range);
-                cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;    
-                process_SN();     
-                print_stats();  
-                //print_stats_midplane(); 
-            }
+                    
+                    count++;     
+                                          
+                       }
             
-            //if it is the last column being processed
-            //do: 1->1, 1->2, 2->1, 2->2
-            else if (num_in_process==count_xy_glbl) {
-                 
-                //like normal
+            
+           
+        } //end of loop
+        
+         num_in_process++;
+        
+        
+        
+        //special case where the first column needs to be populated
+        if (num_in_process==1)
+        {
+           ptr_1_range=count-1; 
+           copy_into_star1(ptr_1_range);           
+          
+          //initialize stats array
+          stats = (struct statistics **)realloc(stats, (count_xy_glbl+1) * sizeof(struct statistics *));
+          
+
+            stats_midplane = new statistics [count_z_glbl+1];  
+            stats_radial_mp = new statistics [(count_z_glbl*count_xy_glbl)+1];
+                                                     
+        }
+        //need num_in_process2 to populate star2 with star
+        else if (num_in_process==2)
+        
+        {
+            ptr_2_range=count-1;
+            copy_into_star2(ptr_2_range);
+            cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;    
+            process_SN();     
+            print_stats();  
+          //  print_stats_midplane(); 
+        }
+        
+        //if it is the last column being processed
+        //do: 1->1, 1->2, 2->1, 2->2
+        else if (num_in_process==count_xy_glbl)
+        {
+             
+               //like normal
                 ptr_1_range=ptr_2_range;
                 ptr_2_range=count-1; 
                 
@@ -438,22 +437,24 @@ int main(int argc, char *argv[]) {
                 cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
                 process_SN();    
                 print_stats(); 
-                //print_stats_midplane(); 
-
-                //now run the process SN on itself  
+              //  print_stats_midplane(); 
+                //now run the process SN on itself 
+                
+               
                 copy_star2_into_star1(ptr_2_range);
                 ptr_1_range=ptr_2_range;
                 cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;
                 process_SN_end_subsection();
                 print_stats(); 
-                //print_stats_midplane(); 
+             //   print_stats_midplane(); 
 
                 //output will show num in process 2 times, cause the last one does get processed twice
-                 
-            }
-            
-            //this is the normal condition
-            else {
+             
+        }
+        
+        //this is the normal condition
+            else
+            {
                 //shift the dynamic array star2 to star1 and the new column into star2
                 ptr_1_range=ptr_2_range;
                 ptr_2_range=count-1; 
@@ -462,41 +463,41 @@ int main(int argc, char *argv[]) {
                 delete [] star2;
                 copy_temp_into_star2(ptr_2_range);
                 delete [] star;
-
                 //copy_into_star2(ptr_2_range); 
                 cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
                 process_SN();    
                 print_stats(); 
-            }
-            
-            count=1;
-        }// 432 - end of Loop 1
-    //}// 432- end of omp parallel
 
-    cout << "\n number stars: "<<num_stars_glbl;
-    cout << "\n number of SNII: "<<num_sn_glbl;
-    cout << "\n number of SNIa: "<<num_sn_Ia_glbl;
-    cout << "\n total stellar mass: "<<total_stellar_mass_glbl;
-    cout << "\n Sterilization distance multiplier: "<<ster_dist_multi;
-    cout << "\n Number density type: "<<number_density_type;
-    cout << "\n";
+      
+            }
+
+         count=1;
+  
+    
+
+
+}//end of loop
+
+
+    
+   
+cout << "\n number stars: "<<num_stars_glbl;
+cout << "\n number of SNII: "<<num_sn_glbl;
+cout << "\n number of SNIa: "<<num_sn_Ia_glbl;
+cout << "\n total stellar mass: "<<total_stellar_mass_glbl;
+cout << "\n Sterilization distance multiplier: "<<ster_dist_multi;
+cout << "\n Number density type: "<<number_density_type;
+cout << "\n";
 
 
     output_stats();
   
     //remember to delete the dynamic arrays columns
-    delete subsect_ptr;
-    delete star,star1,star2;
-    delete column_array;
-    delete stats;
+     delete subsect_ptr;
+     delete star,star1,star2;
+     delete column_array;
+     delete stats;
      
-    // 432 - End Timers
-    gettimeofday(&end, NULL);
-    elapsed = ((end.tv_sec*1000000.0 + end.tv_usec) -
-                (start.tv_sec*1000000.0 + start.tv_usec)) / 1000000.00;
-
-    printf("Elapsed time: %.2f seconds\n",elapsed);
-
     return 0;
 }
 
