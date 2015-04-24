@@ -79,11 +79,89 @@ V1.8 Added -fopenmp flag to compiler
 	Through debugging, was able to pinpoint problem to 'omp parallel' block
 	Limiting threads to 2 and removing omp parallel parameters in an attempt to debug
 
-V1.9 
+V1.9 Stripped down omp blocks to single 'omp parallel for' on loop3 with specific parameters
+	Ran into too many issues with omp, so backtracked to simplest state to work from ground up
+	Have to use static scheduling
+	Have to use ordering at second if block (unsure why)
+	Still no performance gains, but at least compiles
+	Will commit to git at this point before moving on
+
+V1.10
+	Unable to get working, running into too many issues
+	Decided to rethink approach
 
 V1 SUMMARY
-	No real improvements through OpenMp. Could possibly use more tweaking, but will move on to version 2 for now with changes intact. Going to continue going for 'low hanging fruit' first and move on to compiler optimization flags.
+	No improvements at all through OpenMP. Much harder than expected. Loops are complex and cannot be tackled with simple omp blocks. Much more tweaking to do and hopefully we will see results. Next step is to go for easier methods of improvement such as compile optimizations
 
 ===================
 
-V2.0 Compiler Optimizations (0, 1, 2, 3, fast)
+V2.0 O0 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+	Elapsed time: 54.94 seconds
+
+	Huge improvement, performance increase of about factor 2
+
+V2.1 O1 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+	Elapsed time: 55.28 seconds
+
+	No improvement from flag 0
+
+V2.2 O2 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+	Elapsed time: 48.67 seconds
+
+	Slight improvement from flag 0 and 1
+
+V2.3 O3 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+	Elapsed time: 39.86 seconds
+
+	Noticable improvements from previous flags
+	Overall performance gain now at factor 3
+
+V2.4 Ofast optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+	Elapsed time: 37.87 seconds
+
+	Very slight performance gain over previous flags
+
+
+
+
+
+====================
+
+V3.0 Profiling with gprof and running_total
+	Used gprof to profile original application
+	Found that it sends a lot of time in running_total
+	Added omp parallel for around running_total for loop
+	Made the code run terribly slow, so slow that I couldn't let it finish
+	Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. However, parallelzing the loop inside running_total is useless since it is so fast already. In fact, it adds overhead, causing a slowdown
+
+V2.1 

@@ -1,4 +1,4 @@
-CFLAGS = -fopenmp
+CFLAGS = -pg -fopenmp -Ofast
 
 default: app
 
