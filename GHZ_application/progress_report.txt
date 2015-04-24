@@ -12,15 +12,36 @@ V0 Observations
 		Use OpenMP to parallelize loops
 
 V1.0, Loop3 parallelized with OpenMP 
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
 	Elapsed time: 116.62 seconds
 	Elapsed time: 116.73 seconds
 
 V1.1, Loop3 and Loop2 parallelized with OpenMP
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
 	Elapsed time: 114.73 seconds
 	Elapsed time: 118.51 seconds
 	Elapsed time: 115.07 seconds
 
 V1.2, All loops parallelized with OpenMP
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
 	Elapsed time: 115.31 seconds
 	Elapsed time: 121.82 seconds
 
@@ -102,6 +123,7 @@ V2.0 O0 optimization flag
 	total stellar mass: 3833250.76781443
 	Sterilization distance multiplier: 1
 	Number density type: 1
+
 	Elapsed time: 54.94 seconds
 
 	Huge improvement, performance increase of about factor 2
@@ -113,6 +135,7 @@ V2.1 O1 optimization flag
 	total stellar mass: 3833250.76781443
 	Sterilization distance multiplier: 1
 	Number density type: 1
+
 	Elapsed time: 55.28 seconds
 
 	No improvement from flag 0
@@ -124,6 +147,7 @@ V2.2 O2 optimization flag
 	total stellar mass: 3833250.76781443
 	Sterilization distance multiplier: 1
 	Number density type: 1
+
 	Elapsed time: 48.67 seconds
 
 	Slight improvement from flag 0 and 1
@@ -135,6 +159,7 @@ V2.3 O3 optimization flag
 	total stellar mass: 3833250.76781443
 	Sterilization distance multiplier: 1
 	Number density type: 1
+
 	Elapsed time: 39.86 seconds
 
 	Noticable improvements from previous flags
@@ -147,21 +172,135 @@ V2.4 Ofast optimization flag
 	total stellar mass: 3833250.00921503
 	Sterilization distance multiplier: 1
 	Number density type: 1
+
 	Elapsed time: 37.87 seconds
 
 	Very slight performance gain over previous flags
 
-
-
-
-
+V2 SUMMARY
+ foo
 ====================
 
 V3.0 Profiling with gprof and running_total
 	Used gprof to profile original application
-	Found that it sends a lot of time in running_total
-	Added omp parallel for around running_total for loop
-	Made the code run terribly slow, so slow that I couldn't let it finish
-	Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. However, parallelzing the loop inside running_total is useless since it is so fast already. In fact, it adds overhead, causing a slowdown
+		Found that it sends a lot of time in running_total
+		Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. Parallelzing the loop inside running_total would be useless since it is so fast already. In fact, it adds overhead, causing a slowdown. I added an omp parallel for section within running_total to test this out and th eprogram became unbearably slow.
+	Used gprof to profile V1
+		No differences from original application
+	Used gprof to profile V2
+		running_total is no longer listed in the output
+		get_star_range function family and process_SN are now the leaders in runtime
+		No for loops within get_star_range function family
+		Multiple loops within process_SN
+		Will attempt to apply omp to loops within process_SN
 
-V2.1 
+V3.1 Apply 'omp parallel for' to loop 1.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 35.02 seconds
+	Elapsed time: 35.05 seconds
+	Elapsed time: 35.74 seconds
+
+	Very slight improvement
+
+V3.2 Apply 'omp parallel for' to loops 1.1 and 1.2 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 34.34 seconds
+	Elapsed time: 34.06 seconds
+
+	Very slight improvement
+
+V3.3 Apply 'omp parallel for' to loops 1.1, 1.2, and 2.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 33.30 seconds
+	Elapsed time: 31.55 seconds
+	Elapsed time: 32.90 seconds
+
+	More slight improvements
+
+V3.4 Apply 'omp parallel for' to loops 1, 1.1, 1.2, and 2.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 27.13 seconds
+	Elapsed time: 26.77 seconds
+
+	Slightly larger improvements than previous versions
+
+V3.5 Apply 'omp parallel for' to all loops within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 24.41 seconds
+	Elapsed time: 23.82 seconds
+
+	Slight improvements
+
+V3.6 Apply 'omp parallel for' to outer loops (1 and 2) within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 35.55 seconds
+
+	Lost fair amount of performance, rolling back to V3.5
+
+V3.7 Changed scheduling to static for all loop
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 18.03 seconds
+	Elapsed time: 18.33 seconds
+
+	Huge improvement
+
+V3.8 Changed outer loops (1 and 2) to nowait
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.40 seconds
+	Elapsed time: 17.66 seconds
+
+	Slight improvement
+
+V3 SUMMARY
+	foo
+
+
+
