@@ -1,0 +1,228 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 24.87      3.88     3.88                             generate_birth_date(float, float)
+ 21.79      7.28     3.40        2     1.70     4.59  process_SN_end_subsection()
+ 21.35     10.61     3.33    29134     0.00     0.00  get_star_range_upper_cell_right(int)
+ 15.51     13.03     2.42    29144     0.00     0.00  get_star_range_upper_cell_left(int)
+  6.60     14.06     1.03                             CRandomMersenne::Random() [clone .constprop.12]
+  3.21     14.56     0.50                             random_star_generator_Z(float, float)
+  2.95     15.02     0.46                             copy_temp_into_star2(long)
+  2.24     15.37     0.35                             copy_star2_into_star1(long)
+  0.77     15.49     0.12 13497423     0.00     0.00  CRandomMersenne::BRandom()
+  0.38     15.55     0.06                             print_stats()
+  0.13     15.57     0.02    58298     0.00     0.00  wrap_around_function(float, float, float, float)
+  0.06     15.58     0.01    29150     0.00     0.00  get_star_range_lower_cell_left(int)
+  0.06     15.59     0.01    29144     0.00     0.00  get_star_range_lower(int)
+  0.06     15.60     0.01                             create_subsections()
+  0.00     15.60     0.00    29347     0.00     0.00  get_star_range_upper(int)
+  0.00     15.60     0.00    29127     0.00     0.00  get_star_range_lower_cell_right(int)
+  0.00     15.60     0.00        1     0.00     0.00  _GLOBAL__sub_I__ZN15CRandomMersenne5Init0Ej
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.06% of 15.60 seconds
+
+index % time    self  children    called     name
+                               29136             process_SN_end_subsection() [1]
+                3.40    5.79       2/2           process_SN() [2]
+[1]     58.9    3.40    5.79       2+29136   process_SN_end_subsection() [1]
+                3.33    0.00   29134/29134       get_star_range_upper_cell_right(int) [4]
+                2.42    0.01   29144/29144       get_star_range_upper_cell_left(int) [5]
+                0.02    0.00   58298/58298       wrap_around_function(float, float, float, float) [12]
+                0.01    0.00   29144/29144       get_star_range_lower(int) [14]
+                0.00    0.00   29347/29347       get_star_range_upper(int) [24]
+                               29136             process_SN_end_subsection() [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     58.9    0.00    9.19                 process_SN() [2]
+                3.40    5.79       2/2           process_SN_end_subsection() [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     24.9    3.88    0.00                 generate_birth_date(float, float) [3]
+-----------------------------------------------
+                               29123             get_star_range_upper_cell_right(int) [4]
+                3.33    0.00   29134/29134       process_SN_end_subsection() [1]
+[4]     21.3    3.33    0.00   29134+29123   get_star_range_upper_cell_right(int) [4]
+                0.00    0.00   29127/29127       get_star_range_lower_cell_right(int) [25]
+                               29123             get_star_range_upper_cell_right(int) [4]
+-----------------------------------------------
+                               29138             get_star_range_upper_cell_left(int) [5]
+                2.42    0.01   29144/29144       process_SN_end_subsection() [1]
+[5]     15.6    2.42    0.01   29144+29138   get_star_range_upper_cell_left(int) [5]
+                0.01    0.00   29150/29150       get_star_range_lower_cell_left(int) [13]
+                               29138             get_star_range_upper_cell_left(int) [5]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      6.6    1.03    0.00                 CRandomMersenne::Random() [clone .constprop.12] [6]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      4.0    0.50    0.12                 random_star_generator_Z(float, float) [7]
+                0.12    0.00 13497423/13497423     CRandomMersenne::BRandom() [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]      2.9    0.46    0.00                 copy_temp_into_star2(long) [8]
+-----------------------------------------------
+                                                 <spontaneous>
+[9]      2.2    0.35    0.00                 copy_star2_into_star1(long) [9]
+-----------------------------------------------
+                0.12    0.00 13497423/13497423     random_star_generator_Z(float, float) [7]
+[10]     0.8    0.12    0.00 13497423         CRandomMersenne::BRandom() [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     0.4    0.06    0.00                 print_stats() [11]
+-----------------------------------------------
+                0.02    0.00   58298/58298       process_SN_end_subsection() [1]
+[12]     0.1    0.02    0.00   58298         wrap_around_function(float, float, float, float) [12]
+-----------------------------------------------
+                0.01    0.00   29150/29150       get_star_range_upper_cell_left(int) [5]
+[13]     0.1    0.01    0.00   29150         get_star_range_lower_cell_left(int) [13]
+-----------------------------------------------
+                0.01    0.00   29144/29144       process_SN_end_subsection() [1]
+[14]     0.1    0.01    0.00   29144         get_star_range_lower(int) [14]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.1    0.01    0.00                 create_subsections() [15]
+-----------------------------------------------
+                0.00    0.00   29347/29347       process_SN_end_subsection() [1]
+[24]     0.0    0.00    0.00   29347         get_star_range_upper(int) [24]
+-----------------------------------------------
+                0.00    0.00   29127/29127       get_star_range_upper_cell_right(int) [4]
+[25]     0.0    0.00    0.00   29127         get_star_range_lower_cell_right(int) [25]
+-----------------------------------------------
+                0.00    0.00       1/1           __libc_csu_init [66]
+[26]     0.0    0.00    0.00       1         _GLOBAL__sub_I__ZN15CRandomMersenne5Init0Ej [26]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [26] _GLOBAL__sub_I__ZN15CRandomMersenne5Init0Ej [24] get_star_range_upper(int) [5] get_star_range_upper_cell_left(int)
+  [11] print_stats()          [12] wrap_around_function(float, float, float, float) [25] get_star_range_lower_cell_right(int)
+  [15] create_subsections()    [9] copy_star2_into_star1(long) [4] get_star_range_upper_cell_right(int)
+   [3] generate_birth_date(float, float) [7] random_star_generator_Z(float, float) [6] CRandomMersenne::Random() [clone .constprop.12]
+   [8] copy_temp_into_star2(long) [1] process_SN_end_subsection() [10] CRandomMersenne::BRandom()
+  [14] get_star_range_lower(int) [13] get_star_range_lower_cell_left(int)

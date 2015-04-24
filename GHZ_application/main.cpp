@@ -294,180 +294,171 @@ int main(int argc, char *argv[]) {
     cout << "\n number stars: "<<num_stars_glbl;
     cout <<"\n";
     
-    // 432 - Loop 1 - count_xy_glbl
-    //#pragma omp parallel shared(star,column_array,subsect_ptr,count_xy_glbl) private(num_in_process)
-    //{ 
         
-        // 432 Declare loop variables
-        int l, k;
-        long int j;
+    // 432 Declare loop variables
+    int l, k;
+    long int j;
 
-        //#pragma omp parallel for schedule(dynamic)
-        for (l=1; l<=count_xy_glbl; l++) {
-            star = new star_cell [column_array[l]->num_stars+1];
+    for (l=1; l<=count_xy_glbl; l++) {
+        star = new star_cell [column_array[l]->num_stars+1];
 
-            // 432 - Loop 2 - column_array[l]->cell_max
-            //loop that iterates through each cell in the column
-            //#pragma omp for schedule(dynamic)
-            for (j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++) {
+        // 432 - Loop 2 - column_array[l]->cell_max
+        //loop that iterates through each cell in the column
+        for (j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++) {
 
-                // 432 - Loop 3 - subsect_ptr[j]->num_stars
-                //#pragma omp parallel for ordered schedule(static) private(k)
-                for (k=1; k<=subsect_ptr[j]->num_stars; k++) {
-                    //cout <<"THREAD: "<<omp_get_thread_num();
-                    //cout <<"\n";
+            // 432 - Loop 3 - subsect_ptr[j]->num_stars
+            for (k=1; k<=subsect_ptr[j]->num_stars; k++) {
+                //cout <<"THREAD: "<<omp_get_thread_num();
+                //cout <<"\n";
 
-                    star[count].subsection_z=subsect_ptr[j]->subsection_z;
+                star[count].subsection_z=subsect_ptr[j]->subsection_z;
 
-                    star[count].cell=j;
-                    //for radial distance in cylindrical coordinates
-                    R=random_star_generator_R(subsect_ptr[j]->angle_min,subsect_ptr[j]->angle_max, 
-                        subsect_ptr[j]->radial_distance_min, subsect_ptr[j]->radial_distance_max);
+                star[count].cell=j;
+                //for radial distance in cylindrical coordinates
+                R=random_star_generator_R(subsect_ptr[j]->angle_min,subsect_ptr[j]->angle_max, 
+                    subsect_ptr[j]->radial_distance_min, subsect_ptr[j]->radial_distance_max);
 
-                    degree=degree_generator(subsect_ptr[j]->angle_min, subsect_ptr[j]->angle_max);
-                    //set x,y,z coordinates
-                    star[count].x_coord=R*(cos(degree*(pi_fn/180)));
-                    star[count].y_coord=R*(sin(degree*(pi_fn/180)));
-                    star[count].z_coord=random_star_generator_Z(subsect_ptr[j]->z_min,subsect_ptr[j]->z_max);
+                degree=degree_generator(subsect_ptr[j]->angle_min, subsect_ptr[j]->angle_max);
+                //set x,y,z coordinates
+                star[count].x_coord=R*(cos(degree*(pi_fn/180)));
+                star[count].y_coord=R*(sin(degree*(pi_fn/180)));
+                star[count].z_coord=random_star_generator_Z(subsect_ptr[j]->z_min,subsect_ptr[j]->z_max);
 
-                    //initialize sterilization value to 0
-                    star[count].sterilized=0;
-                    //initialize sn value to 0
-                    star[count].sn=0;
-                    star[count].mass=stellar_mass();
-                    total_stellar_mass_glbl+=star[count].mass;
+                //initialize sterilization value to 0
+                star[count].sterilized=0;
+                //initialize sn value to 0
+                star[count].sn=0;
+                star[count].mass=stellar_mass();
+                total_stellar_mass_glbl+=star[count].mass;
 
-                    star[count].birth_date=generate_birth_date((R/1000),rg.Random());            
-                    star[count].ms_lifetime=generate_ms_lifetime(star[count].mass);
-                    star[count].death_date=star[count].birth_date+star[count].ms_lifetime;
+                star[count].birth_date=generate_birth_date((R/1000),rg.Random());            
+                star[count].ms_lifetime=generate_ms_lifetime(star[count].mass);
+                star[count].death_date=star[count].birth_date+star[count].ms_lifetime;
 
+                
+
+                //determines if a star is a typeII SN, returns 1 if it is a SN
+                if ((SN_star(star[count].mass))==1) {
+                    star[count].sn=1; 
+                    //sets the sterilization distance of the SNII
+                    star[count].sterilization_distance=SNII_distance(rg.Random());
                     
+                    //multiplies the serilization distance by the multiplier for sensitivity analysis
+                    star[count].sterilization_distance*=sterilization_multiplier;
+                    
+                    if (star[count].death_date<=13.24) {  
+                        num_sn_glbl++; 
 
-                    //determines if a star is a typeII SN, returns 1 if it is a SN
-                    //#pragma omp ordered
-                    if ((SN_star(star[count].mass))==1) {
-                        star[count].sn=1; 
-                        //sets the sterilization distance of the SNII
-                        star[count].sterilization_distance=SNII_distance(rg.Random());
+                        //calculate some global statistics between 2.5-15kpc
+                        //to remove those statistics between 0-2.5kpc
+                        if (l>(int((2500/radial_dist_cell_size))) ) {
+                            num_SNII_specific++; 
+                        }  
+                    }      
+                }
+
+                //determines if a star will cause a typeIa SN
+                //it will return 2 if it is, and 0 if it isn't
+                if ((star[count].mass >=type_Ia_mass_lower_fn)&&(star[count].mass <type_Ia_mass_upper_fn) && (star[count].death_date<=max_time_fn)) {
+                    star[count].sn=type_Ia_candidate();       
+
+                    //if the star is a typeIa SN- set its sterilization distance
+                    if (star[count].sn==2) {
+                        //sets the sterilization distance of the SNIa
+                        star[count].sterilization_distance=SNIa_distance(rg.Random());   
                         
                         //multiplies the serilization distance by the multiplier for sensitivity analysis
                         star[count].sterilization_distance*=sterilization_multiplier;
-                        
-                        if (star[count].death_date<=13.24) {  
-                            num_sn_glbl++; 
 
-                            //calculate some global statistics between 2.5-15kpc
-                            //to remove those statistics between 0-2.5kpc
-                            if (l>(int((2500/radial_dist_cell_size))) ) {
-                                num_SNII_specific++; 
-                            }  
-                        }      
-                    }
+                        num_sn_Ia_glbl++;    
 
-                    //determines if a star will cause a typeIa SN
-                    //it will return 2 if it is, and 0 if it isn't
-                    //#pragma omp ordered
-                    if ((star[count].mass >=type_Ia_mass_lower_fn)&&(star[count].mass <type_Ia_mass_upper_fn) && (star[count].death_date<=max_time_fn)) {
-                        star[count].sn=type_Ia_candidate();       
-
-                        //if the star is a typeIa SN- set its sterilization distance
-                        if (star[count].sn==2) {
-                            //sets the sterilization distance of the SNIa
-                            star[count].sterilization_distance=SNIa_distance(rg.Random());   
-                            
-                            //multiplies the serilization distance by the multiplier for sensitivity analysis
-                            star[count].sterilization_distance*=sterilization_multiplier;
-
-                            num_sn_Ia_glbl++;    
-
-                            //calculate some global statistics between 2.5-15kpc
-                            //to remove those statistics between 0-2.5kpc
-                            if (l>(int((2500/radial_dist_cell_size))) ) {
-                                num_SNIa_specific++;
-                            }                          
-                        }                                                
-                    }
-                    
-
-                    count++;     
-                } // 432 - end of Loop 3
-
-            } //432 - end of loop 2
-            
-            
-
-            num_in_process++;
-
-            //special case where the first column needs to be populated
-            if (num_in_process==1) {
-                ptr_1_range=count-1; 
-                copy_into_star1(ptr_1_range);           
-              
-                //initialize stats array
-                stats = (struct statistics **)realloc(stats, (count_xy_glbl+1) * sizeof(struct statistics *));
-
-                stats_midplane = new statistics [count_z_glbl+1];  
-                stats_radial_mp = new statistics [(count_z_glbl*count_xy_glbl)+1];
-                                                         
-            }
-
-            //need num_in_process2 to populate star2 with star
-            else if (num_in_process==2) {
-                ptr_2_range=count-1;
-                copy_into_star2(ptr_2_range);
-                cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;    
-                process_SN();    
-                print_stats();  
-                //print_stats_midplane(); 
-            }
-            
-            //if it is the last column being processed
-            //do: 1->1, 1->2, 2->1, 2->2
-            else if (num_in_process==count_xy_glbl) {
-                 
-                //like normal
-                ptr_1_range=ptr_2_range;
-                ptr_2_range=count-1; 
+                        //calculate some global statistics between 2.5-15kpc
+                        //to remove those statistics between 0-2.5kpc
+                        if (l>(int((2500/radial_dist_cell_size))) ) {
+                            num_SNIa_specific++;
+                        }                          
+                    }                                                
+                }
                 
-                copy_star2_into_star1(ptr_1_range); 
-                copy_temp_into_star2(ptr_2_range); 
-                cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
-                process_SN();
-                print_stats(); 
-                //print_stats_midplane(); 
 
-                //now run the process SN on itself  
-                copy_star2_into_star1(ptr_2_range);
-                ptr_1_range=ptr_2_range;
-                cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;
-                process_SN_end_subsection();
-                print_stats(); 
-                //print_stats_midplane(); 
+                count++;     
+            } // 432 - end of Loop 3
 
-                //output will show num in process 2 times, cause the last one does get processed twice
-                 
-            }
+        } //432 - end of loop 2
+        
+        
+
+        num_in_process++;
+
+        //special case where the first column needs to be populated
+        if (num_in_process==1) {
+            ptr_1_range=count-1; 
+            copy_into_star1(ptr_1_range);           
+          
+            //initialize stats array
+            stats = (struct statistics **)realloc(stats, (count_xy_glbl+1) * sizeof(struct statistics *));
+
+            stats_midplane = new statistics [count_z_glbl+1];  
+            stats_radial_mp = new statistics [(count_z_glbl*count_xy_glbl)+1];
+                                                     
+        }
+
+        //need num_in_process2 to populate star2 with star
+        else if (num_in_process==2) {
+            ptr_2_range=count-1;
+            copy_into_star2(ptr_2_range);
+            cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;    
+            process_SN();    
+            print_stats();  
+            //print_stats_midplane(); 
+        }
+        
+        //if it is the last column being processed
+        //do: 1->1, 1->2, 2->1, 2->2
+        else if (num_in_process==count_xy_glbl) {
+             
+            //like normal
+            ptr_1_range=ptr_2_range;
+            ptr_2_range=count-1; 
             
-            //this is the normal condition
-            else {
-                //shift the dynamic array star2 to star1 and the new column into star2
-                ptr_1_range=ptr_2_range;
-                ptr_2_range=count-1; 
-                delete [] star1;
-                copy_star2_into_star1(ptr_1_range);
-                delete [] star2;
-                copy_temp_into_star2(ptr_2_range);
-                delete [] star;
+            copy_star2_into_star1(ptr_1_range); 
+            copy_temp_into_star2(ptr_2_range); 
+            cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
+            process_SN();
+            print_stats(); 
+            //print_stats_midplane(); 
 
-                //copy_into_star2(ptr_2_range); 
-                cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
-                process_SN();   
-                print_stats(); 
-            }
-            
-            count=1;
-        }// 432 - end of Loop 1
-    //}// 432- end of omp parallel
+            //now run the process SN on itself  
+            copy_star2_into_star1(ptr_2_range);
+            ptr_1_range=ptr_2_range;
+            cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;;
+            process_SN_end_subsection();
+            print_stats(); 
+            //print_stats_midplane(); 
+
+            //output will show num in process 2 times, cause the last one does get processed twice
+             
+        }
+        
+        //this is the normal condition
+        else {
+            //shift the dynamic array star2 to star1 and the new column into star2
+            ptr_1_range=ptr_2_range;
+            ptr_2_range=count-1; 
+            delete [] star1;
+            copy_star2_into_star1(ptr_1_range);
+            delete [] star2;
+            copy_temp_into_star2(ptr_2_range);
+            delete [] star;
+
+            //copy_into_star2(ptr_2_range); 
+            cout <<"\nnum in process: "<<num_in_process<<"/"<<count_xy_glbl;
+            process_SN();   
+            print_stats(); 
+        }
+        
+        count=1;
+    }// 432 - end of Loop 1
 
     cout << "\n number stars: "<<num_stars_glbl;
     cout << "\n number of SNII: "<<num_sn_glbl;
@@ -498,160 +489,137 @@ int main(int argc, char *argv[]) {
 
 void process_SN_end_subsection()
 {
-     float sn_x, sn_y, sn_z;
+    float sn_x, sn_y, sn_z;
+    float distance;
+    float distance2;
+    float sn2=typeII;
+    float snIa=typeIa;
+    int sn_type=0;
+    int wrap_flag;
+    float sterilization_distance;
+    float birthdate_sn=0;
+    float birthdate_candidate=0;
+    float deathdate_sn=0;
+    float deathdate_candidate=0;
+    float max_time_fn=max_time;
+    int normal_ster_flag=0;
+    int wrap_ster_flag=0;
      
-     float distance;
-     float distance2;
-     float sn2=typeII;
-     float snIa=typeIa;
-     int sn_type=0;
-     int wrap_flag;
-     float sterilization_distance;
-     float birthdate_sn=0;
-     float birthdate_candidate=0;
-     float deathdate_sn=0;
-     float deathdate_candidate=0;
-     float max_time_fn=max_time;
-      int normal_ster_flag=0;
-      int wrap_ster_flag=0;
+    //always looking for the SN as they occur in star1
+    //eg 1->1, 1->2, 2->1
      
-     //always looking for the SN as they occur in star1
-     //eg 1->1, 1->2, 2->1
-     
-         //********************************
-         //1->1 on itself and 1->2
-         for (long int i=1; i<=ptr_1_range; i++)
-         {
-             
-             //********************************
-         //1->1 on itself
-         //*************************************
-                     if(star1[i].sn==1 || star1[i].sn==2)
-                     {
+    //********************************
+    //1->1 on itself and 1->2
+    #pragma omp parallel num_threads(4)
+    {
+
+    #pragma omp for nowait schedule(static)
+    for (long int i=1; i<=ptr_1_range; i++)
+    {  
+        //********************************
+        //1->1 on itself
+        //*************************************
+        if(star1[i].sn==1 || star1[i].sn==2)
+        {
                               
-                             //set the birthdate/deathdate of the SN star
-                             birthdate_sn=star1[i].birth_date;
-                             deathdate_sn=star1[i].death_date;
-                               //sterilization distance for typeII
-                             //to be replaced with the distributions of distances
-                             if (star1[i].sn==1)
-                             {           
-                             sterilization_distance=star1[i].sterilization_distance; 
-                             sn_type=1;
-                             }          
-                             //sterilization distance for typeII
-                             //to be replaced with the distributions of distances
-                             else if (star1[i].sn==2)
-                             {
-                             sterilization_distance=star1[i].sterilization_distance;   
-                             sn_type=2;  
-                             }
+            //set the birthdate/deathdate of the SN star
+            birthdate_sn=star1[i].birth_date;
+            deathdate_sn=star1[i].death_date;
+            //sterilization distance for typeII
+            //to be replaced with the distributions of distances
+            if (star1[i].sn==1) {           
+                sterilization_distance=star1[i].sterilization_distance; 
+                sn_type=1;
+            }          
+            //sterilization distance for typeII
+            //to be replaced with the distributions of distances
+            else if (star1[i].sn==2) {
+                sterilization_distance=star1[i].sterilization_distance;   
+                sn_type=2;  
+            }
+                                            
+                                   
+            sn_x=star1[i].x_coord;
+            sn_y=star1[i].y_coord;
+            sn_z=star1[i].z_coord;
+            wrap_flag=0;
+            if(wrap_around_function(sn_x, sn_y, sn_z,sterilization_distance)==1) {
+                wrap_flag=1;                              
+            }
+            
+            #pragma omp parallel for schedule(static) num_threads(4)               
+            for (long int j=get_star_range_lower(i); j<=get_star_range_upper(i); j++)
+            {
+
+                normal_ster_flag=0;
+                wrap_ster_flag=0;
+                birthdate_candidate=star1[j].birth_date;
+                deathdate_candidate=star1[j].death_date;
+                distance=(sqrt
+                (
+                ((sn_x-star1[j].x_coord)*(sn_x-star1[j].x_coord))+
+                ((sn_y-star1[j].y_coord)*(sn_y-star1[j].y_coord))+
+                ((sn_z-star1[j].z_coord)*(sn_z-star1[j].z_coord))
+                ));
+                                      
+                //wrap around distance
+                if (wrap_flag==1) {
+                    distance2=(sqrt
+                   (
+                   ((wrap_around.x_coord-star1[j].x_coord)*(wrap_around.x_coord-star1[j].x_coord))+
+                   ((wrap_around.y_coord-star1[j].y_coord)*(wrap_around.y_coord-star1[j].y_coord))+
+                   ((wrap_around.z_coord-star1[j].z_coord)*(wrap_around.z_coord-star1[j].z_coord))
+                   ));                               
+                                     
+                }
+                                      
+                //normal sterilization
+                if((distance<=sterilization_distance) && (birthdate_candidate<deathdate_sn) && (deathdate_candidate > deathdate_sn)
+                    && (deathdate_sn <=max_time_fn))
+                {
+                    if (sn_type==1) {
+                        star1[j].sterilized=1;  
+                    }
+                    else if (sn_type==2) {
+                        star1[j].sterilized=2;  
+                    }
+
+                    star1[j].sterilization_date=deathdate_sn; 
+                    normal_ster_flag=1;       
+                            
+                }
                                         
-                               
-                              sn_x=star1[i].x_coord;
-                              sn_y=star1[i].y_coord;
-                              sn_z=star1[i].z_coord;
-                              wrap_flag=0;
-                              if(wrap_around_function(sn_x, sn_y, sn_z,sterilization_distance)==1)
-                              {
-                              wrap_flag=1;                              
-                              }
-                                 
-                              for (long int j=get_star_range_lower(i); j<=get_star_range_upper(i); j++)
-                              {
-                                  
-                                  normal_ster_flag=0;
-                                  wrap_ster_flag=0;
-                                  birthdate_candidate=star1[j].birth_date;
-                                  deathdate_candidate=star1[j].death_date;
-                                  distance=(sqrt
-                                               (
-                                               ((sn_x-star1[j].x_coord)*(sn_x-star1[j].x_coord))+
-                                               ((sn_y-star1[j].y_coord)*(sn_y-star1[j].y_coord))+
-                                               ((sn_z-star1[j].z_coord)*(sn_z-star1[j].z_coord))
-                                               ));
-                                  
-                                  //wrap around distance
-                                  if (wrap_flag==1)
-                                  {
-                                  distance2=(sqrt
-                                               (
-                                               ((wrap_around.x_coord-star1[j].x_coord)*(wrap_around.x_coord-star1[j].x_coord))+
-                                               ((wrap_around.y_coord-star1[j].y_coord)*(wrap_around.y_coord-star1[j].y_coord))+
-                                               ((wrap_around.z_coord-star1[j].z_coord)*(wrap_around.z_coord-star1[j].z_coord))
-                                               ));                               
-                                                                 
-                                  }
-                                  
-                                  //normal sterilization
-                                  if(
-                                  (distance<=sterilization_distance) && (birthdate_candidate<deathdate_sn) && (deathdate_candidate > deathdate_sn)
-                                  && (deathdate_sn <=max_time_fn)
-                                  )
-                                  {
-                                      if (sn_type==1)
-                                     {
-                                     star1[j].sterilized=1;  
-                                     }
-                                     else if (sn_type==2)
-                                     {
-                                     star1[j].sterilized=2;  
-                                     }
- 
-                                     star1[j].sterilization_date=deathdate_sn; 
-                                     normal_ster_flag=1;       
-                                      
-                                     
-                                
-                                     
-                                      
-                                  }
-                                    
-                                    //wrap around sterilization
-                                    if(
-                                    (wrap_flag==1) && (distance2<=sterilization_distance)
-                                     && (birthdate_candidate<deathdate_sn) && (deathdate_candidate > deathdate_sn) 
-                                     && (deathdate_sn <=max_time_fn)
-                                     )
-                                  {
-                                     if (sn_type==1)
-                                     {
-                                     star1[j].sterilized=1;  
-                                     }
-                                     else if (sn_type==2)
-                                     {
-                                     star1[j].sterilized=2;  
-                                     }
+                //wrap around sterilization
+                if((wrap_flag==1) && (distance2<=sterilization_distance)
+                    && (birthdate_candidate<deathdate_sn) && (deathdate_candidate > deathdate_sn) 
+                    && (deathdate_sn <=max_time_fn))
+                {
+                    if (sn_type==1) {
+                        star1[j].sterilized=1;  
+                    }
+                    else if (sn_type==2) {
+                        star1[j].sterilized=2;  
+                    } 
 
-                                     star1[j].sterilization_date=deathdate_sn;
-                                     
-                                     wrap_ster_flag=1;
-                                  
-                                     
+                    star1[j].sterilization_date=deathdate_sn;
+
+                    wrap_ster_flag=1;
+                } // end of wrap around sterilization
                                       
-                                  } // end of wrap around sterilization
-                                  
-                                  if(normal_ster_flag==1 || wrap_ster_flag==1)
-                                    {
-                                          
-                                          if (sn_type==1)
-                                          {
-   
-                                           star1[j].sterilized_count++;
-                                           total_sterilizations_II++;
-                                           }           
-                                           else if (sn_type==2)
-                                           {    
-                                           total_sterilizations_Ia++;
-
-                                           } 
-                                    }  
-
-                                  
-                                  
-                              } //end of loop
-                     }
-         }
+                if(normal_ster_flag==1 || wrap_ster_flag==1) {
+                    if (sn_type==1) {
+                        star1[j].sterilized_count++;
+                        total_sterilizations_II++;
+                    }           
+                    else if (sn_type==2) {    
+                        total_sterilizations_Ia++;
+                    } 
+                }  
+                             
+            } //end of loop
+        }
+    }
+    }
 }
 
 void process_SN()
@@ -719,7 +687,7 @@ void process_SN()
 
                 // sn_debug << "\nstar range lower self "<<get_star_range_lower(i);
                 // sn_debug << "\nstar range upper self: "<<get_star_range_upper(i);
-                #pragma omp parallel for schedule(static)
+                #pragma omp parallel for schedule(static) num_threads(4)
                 for (long int j=get_star_range_lower(i); j<=get_star_range_upper(i); j++)
                 {
                     normal_ster_flag=0;
@@ -804,7 +772,7 @@ void process_SN()
                 // sn_debug << "star: "<<i<<" went SN"<<"  Cell: "<<star1[i].cell<<"  Subsection: "<<star1[i].subsection_z<<"  Column: "<<subsect_param_array[star1[i].cell]->subsection_xy;   
                 // sn_debug << "\nstar range lower right: "<<get_star_range_lower_cell_right(star1[i].cell);
                 // sn_debug << "\nstar range upper right: "<<get_star_range_upper_cell_right(star1[i].cell);
-                #pragma omp parallel for schedule(static)
+                #pragma omp parallel for schedule(static) num_threads(4)
                 for (long int k=get_star_range_lower_cell_right(star1[i].cell); k<=get_star_range_upper_cell_right(star1[i].cell); k++)
                 {
                     normal_ster_flag=0;
@@ -933,7 +901,7 @@ void process_SN()
                     wrap_flag=1;                              
                 }
                            
-                #pragma omp parallel for schedule(static)
+                #pragma omp parallel for schedule(static) num_threads(4)
                 for (long int m=get_star_range_lower_cell_left(star2[l].cell); m<=get_star_range_upper_cell_left(star2[l].cell); m++)
                 {
                     normal_ster_flag=0;

@@ -180,19 +180,19 @@ V2.4 Ofast optimization flag
 V2 SUMMARY
  foo
 ====================
-
-V3.0 Profiling with gprof and running_total
-	Used gprof to profile original application
-		Found that it sends a lot of time in running_total
-		Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. Parallelzing the loop inside running_total would be useless since it is so fast already. In fact, it adds overhead, causing a slowdown. I added an omp parallel for section within running_total to test this out and th eprogram became unbearably slow.
-	Used gprof to profile V1
-		No differences from original application
-	Used gprof to profile V2
-		running_total is no longer listed in the output
-		get_star_range function family and process_SN are now the leaders in runtime
-		No for loops within get_star_range function family
-		Multiple loops within process_SN
-		Will attempt to apply omp to loops within process_SN
+Observations
+	Profiling with gprof and running_total
+		Used gprof to profile original application
+			Found that it sends a lot of time in running_total
+			Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. Parallelzing the loop inside running_total would be useless since it is so fast already. In fact, it adds overhead, causing a slowdown. I added an omp parallel for section within running_total to test this out and th eprogram became unbearably slow.
+		Used gprof to profile V1
+			No differences from original application
+		Used gprof to profile V2
+			running_total is no longer listed in the output
+			get_star_range function family and process_SN are now the leaders in runtime
+			No for loops within get_star_range function family
+			Multiple loops within process_SN
+			Will attempt to apply omp to loops within process_SN
 
 V3.1 Apply 'omp parallel for' to loop 1.1 within process_SN
 	number stars: 13497423
@@ -301,6 +301,25 @@ V3.8 Changed outer loops (1 and 2) to nowait
 
 V3 SUMMARY
 	foo
+
+===================
+Observations
+Profiling revealed that generate_birth_date() and process_SN_end_subsection() have room for improvement
+
+V4.0 Apply omp to generate_birth_date() loops
+	Causes extreme slowdown
+	Loops are small (0..7) and omp overhead not worth it
+
+V4.1 Apply omp to process_SN_end_subsection() loops
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.09 seconds
+	Elapsed time: 17.01 seconds
 
 
 
