@@ -46,24 +46,44 @@ float generate_birth_date(float radius,float random_num)
   float area_part[8]={0,0,0,0,0,0,0,0}; //using 1-7
   float cumulative_area[8]={0,0,0,0,0,0,0,0}; //using 0-7, where cumulative_area[0]=0
 
+  
+  double d2Gyr = SFR_2Gyr(radius)/2;
+  double d4Gyr = SFR_4Gyr(radius)/2;
+  double d6Gyr = SFR_6Gyr(radius)/2;
+  double d8Gyr = SFR_8Gyr(radius)/2;
+  double d10Gyr = SFR_10Gyr(radius)/2;
+  double d12Gyr = SFR_12Gyr(radius)/2; 
+
+  area_part[1]= (0+d2Gyr)*1.64;
+  area_part[2]= (d2Gyr+d4Gyr)*2;
+  area_part[3]= (d4Gyr+d6Gyr)*2;
+  area_part[4]= (d6Gyr+d8Gyr)*2;
+  area_part[5]= (d8Gyr+d10Gyr)*2;
+  area_part[6]= (d10Gyr+d12Gyr)*2;
+  area_part[7]= (d12Gyr+(SFR_136Gyr(radius)/2))*1.6;
+  
+
+  /*
   area_part[1]= ((0+SFR_2Gyr(radius))/2)*1.64;
   area_part[2]= ((SFR_2Gyr(radius)+SFR_4Gyr(radius))/2)*2;
-
   area_part[3]= ((SFR_4Gyr(radius)+SFR_6Gyr(radius))/2)*2;
   area_part[4]= ((SFR_6Gyr(radius)+SFR_8Gyr(radius))/2)*2;
   area_part[5]= ((SFR_8Gyr(radius)+SFR_10Gyr(radius))/2)*2;
   area_part[6]= ((SFR_10Gyr(radius)+SFR_12Gyr(radius))/2)*2;
   area_part[7]= ((SFR_12Gyr(radius)+SFR_136Gyr(radius))/2)*1.6;
-
+  */
+  
+  
   for (int i=1; i<=7;i++)
   {
     total_area+=area_part[i];
     cumulative_area[i]=total_area;
 
-  // cout <<"part: "<<i<<endl;
-  //cout <<"total area: "<<total_area<<endl;
-  //cout <<"cumulative area: "<<cumulative_area[i]<<endl;
+    //cout <<"part: "<<i<<endl;
+    //cout <<"total area: "<<total_area<<endl;
+    //cout <<"cumulative area: "<<cumulative_area[i]<<endl;
   }
+  
 
 
 
@@ -75,35 +95,36 @@ float generate_birth_date(float radius,float random_num)
   
   for (int i=1; i<=7;i++)
   {
-   if(partial_area >= cumulative_area[i-1] && partial_area <= cumulative_area[i])
+    
+    if(partial_area >= cumulative_area[i-1] && partial_area <= cumulative_area[i])
         {
           area=i;
           partial_segment=partial_area-cumulative_area[i-1];
-         // cout <<"\npartial segment: "<<partial_segment <<"\nArea: "<<area<<endl;
-        }                         
-
+          //cout <<"\npartial segment: "<<partial_segment <<"\nArea: "<<area<<endl;
+        }    
 
   }
   
 
-  if (area==1)
+  //if (area==1)
+  if (area < 2)
   {
     time=((area*2)-2)+ ((partial_segment/area_part[area])*1.64);    
-  // cout <<"\n\n\n\n\n partial segment: "<<partial_segment;
-  //  cout <<"\n\n area_part[i]: "<<area_part[area];  
-           
-  }  
+    // cout <<"\n\n\n\n\n partial segment: "<<partial_segment;
+    // cout <<"\n\n area_part[i]: "<<area_part[area];  
+  } 
 
-
-  if (area==2 ||area==3 ||area==4 ||area==5 ||area==6 )
+  //if (area==2 ||area==3 ||area==4 ||area==5 ||area==6 )
+  else if (area < 7)
   {
     time=((area*2)-2)+ ((partial_segment/area_part[area])*2);    
-  //  cout <<"\n\n\n\n\n partial segment: "<<partial_segment;
-  //  cout <<"\n\n area_part[i]: "<<area_part[area];  
+    // cout <<"\n\n\n\n\n partial segment: "<<partial_segment;
+    // cout <<"\n\n area_part[i]: "<<area_part[area]; 
            
   }    
 
-  if (area==7)
+  //if (area==7)
+  else 
   {
     time=((area*2)-2)+ ((partial_segment/area_part[area])*1.6);  
    // cout <<"\n\n\n\n\n partial segment: "<<partial_segment;

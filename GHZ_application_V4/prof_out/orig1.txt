@@ -1,0 +1,384 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 76.54     80.34    80.34 234506168     0.00     0.00  copy_into_star1(long)
+  6.75     87.43     7.09      510    13.90    74.37  process_SN()
+  2.80     90.37     2.94 13497423     0.00     0.00  generate_birth_date(float, float)
+  1.78     92.24     1.87 81379682     0.00     0.00  CRandomMersenne::IRandom(int, int)
+  1.18     93.48     1.24                             main
+  1.08     94.61     1.13 26994846     0.00     0.00  SFR_6Gyr(double)
+  0.94     95.60     0.99 26994846     0.00     0.00  evalfpoly(int, double, double*)
+  0.83     96.47     0.87 26994846     0.00     0.00  SFR_8Gyr(double)
+  0.75     97.25     0.79 26994846     0.00     0.00  SFR_136Gyr(double)
+  0.72     98.02     0.76 73631366     0.00     0.00  get_star_range_upper_cell_right(int)
+  0.72     98.78     0.76      509     1.49     1.49  copy_temp_into_star2(long)
+  0.67     99.47     0.70 81379719     0.00     0.00  CRandomMersenne::BRandom()
+  0.60    100.11     0.64 26994846     0.00     0.00  SFR_12Gyr(double)
+  0.56    100.70     0.59 53989693     0.00     0.00  create_subsections()
+  0.47    101.19     0.49      510     0.96     0.96  copy_star2_into_star1(long)
+  0.46    101.67     0.48                             random_star_generator_R(float, float, float, float)
+  0.42    102.11     0.44 26994846     0.00     0.00  SFR_10Gyr(double)
+  0.40    102.53     0.42 73674353     0.00     0.00  get_star_range_lower(int)
+  0.40    102.95     0.42 73645001     0.00     0.00  degree_generator(float, float)
+  0.37    103.34     0.39                             CRandomMersenne::Random()
+  0.26    103.61     0.27 26994846     0.00     0.00  SFR_4Gyr(double)
+  0.26    103.88     0.27   339003     0.00     0.08  wrap_around_function(float, float, float, float)
+  0.24    104.13     0.25        1   250.00   250.00  create_columns()
+  0.21    104.35     0.22    29200     0.01     0.87  get_star_range_upper(int)
+  0.19    104.55     0.20 26994846     0.00     0.00  CRandomMersenne::IRandomX(int, int)
+  0.13    104.69     0.14        1   140.00   140.00  output_stats()
+  0.11    104.81     0.12    85337     0.00     0.00  get_star_range_upper_cell_left(int)
+  0.10    104.91     0.10                             random_star_generator_Z(float, float)
+  0.04    104.95     0.04 13497423     0.00     0.00  get_star_range_lower_cell_left(int)
+  0.01    104.96     0.01    29196     0.00     0.00  get_star_range_lower_cell_right(int)
+  0.00    104.96     0.00    26375     0.00     0.00  SNIa_distance(double)
+  0.00    104.96     0.00     2825     0.00     0.00  SFR_2Gyr(double)
+  0.00    104.96     0.00      511     0.00     0.00  print_stats()
+  0.00    104.96     0.00        4     0.00     0.00  _fini
+  0.00    104.96     0.00        1     0.00     0.00  copy_into_star2(long)
+  0.00    104.96     0.00        1     0.00   143.80  process_SN_end_subsection()
+  0.00    104.96     0.00        1     0.00     0.00  CRandomMersenne::RandomInitByArray(unsigned int*, int)
+  0.00    104.96     0.00        1     0.00     0.00  CRandomMersenne::Init0(unsigned int)
+  0.00    104.96     0.00        1     0.00     0.00  atexit
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+ 
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this 
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.01% of 104.96 seconds
+
+index % time    self  children    called     name
+                0.01    0.00   29193/234506168     SN_star(float) [32]
+                0.01    0.00   29196/234506168     get_star_range_lower_cell_right(int) [31]
+                0.01    0.00   29493/234506168     get_star_range_lower(int) [22]
+                4.62    0.00 13497424/234506168     main [2]
+               25.23    0.00 73631366/234506168     get_star_range_upper_cell_right(int) [5]
+               25.23    0.00 73644633/234506168     random_star_generator_R(float, float, float, float) [6]
+               25.23    0.00 73644863/234506168     get_star_range_upper(int) [7]
+[1]     76.5   80.34    0.00 234506168         copy_into_star1(long) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     75.0    1.24   77.51                 main [2]
+                7.09   30.84     510/510         process_SN() [3]
+                0.22   21.52  280607/339003      wrap_around_function(float, float, float, float) [4]
+                2.94    5.12 13497423/13497423     generate_birth_date(float, float) [8]
+                4.62    0.00 13497424/234506168     copy_into_star1(long) [1]
+                0.59    2.02 53989693/53989693     create_subsections() [9]
+                0.76    0.00     509/509         copy_temp_into_star2(long) [15]
+                0.49    0.00     510/510         copy_star2_into_star1(long) [19]
+                0.04    0.43 13497423/13497423     get_star_range_lower_cell_left(int) [20]
+                0.31    0.12 13526623/81379682     CRandomMersenne::IRandom(int, int) [10]
+                0.25    0.00       1/1           create_columns() [26]
+                0.00    0.14       1/1           process_SN_end_subsection() [27]
+                0.00    0.00   26375/26375       SNIa_distance(double) [40]
+                0.00    0.00    2825/2825        SFR_2Gyr(double) [41]
+                0.00    0.00     511/511         print_stats() [42]
+                0.00    0.00       1/1           copy_into_star2(long) [44]
+-----------------------------------------------
+                7.09   30.84     510/510         main [2]
+[3]     36.1    7.09   30.84     510         process_SN() [3]
+                0.22   25.23   29196/29200       get_star_range_upper(int) [7]
+                0.05    4.48   58392/339003      wrap_around_function(float, float, float, float) [4]
+                0.42    0.01 73674353/73674353     get_star_range_lower(int) [22]
+                0.42    0.00 73645001/73645001     degree_generator(float, float) [23]
+                0.01    0.01   29196/29196       get_star_range_lower_cell_right(int) [31]
+-----------------------------------------------
+                0.00    0.00       4/339003      process_SN_end_subsection() [27]
+                0.05    4.48   58392/339003      process_SN() [3]
+                0.22   21.52  280607/339003      main [2]
+[4]     25.0    0.27   25.99  339003         wrap_around_function(float, float, float, float) [4]
+                0.76   25.23 73631366/73631366     get_star_range_upper_cell_right(int) [5]
+                0.01    0.00  280607/81379682     CRandomMersenne::IRandom(int, int) [10]
+-----------------------------------------------
+                0.76   25.23 73631366/73631366     wrap_around_function(float, float, float, float) [4]
+[5]     24.8    0.76   25.23 73631366         get_star_range_upper_cell_right(int) [5]
+               25.23    0.00 73631366/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]     24.5    0.48   25.23                 random_star_generator_R(float, float, float, float) [6]
+               25.23    0.00 73644633/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                0.00    0.00       4/29200       process_SN_end_subsection() [27]
+                0.22   25.23   29196/29200       process_SN() [3]
+[7]     24.2    0.22   25.23   29200         get_star_range_upper(int) [7]
+               25.23    0.00 73644863/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                             13497423             generate_birth_date(float, float) [8]
+                2.94    5.12 13497423/13497423     main [2]
+[8]      7.7    2.94    5.12 13497423+13497423 generate_birth_date(float, float) [8]
+                0.79    0.44 26994846/26994846     SFR_136Gyr(double) [11]
+                1.13    0.00 26994846/26994846     SFR_6Gyr(double) [12]
+                0.99    0.00 26994846/26994846     evalfpoly(int, double, double*) [13]
+                0.87    0.00 26994846/26994846     SFR_8Gyr(double) [14]
+                0.64    0.00 26994846/26994846     SFR_12Gyr(double) [17]
+                0.27    0.00 26994846/26994846     SFR_4Gyr(double) [25]
+                             13497423             generate_birth_date(float, float) [8]
+-----------------------------------------------
+                0.59    2.02 53989693/53989693     main [2]
+[9]      2.5    0.59    2.02 53989693         create_subsections() [9]
+                0.93    0.35 40492269/81379682     CRandomMersenne::IRandom(int, int) [10]
+                0.20    0.43 26994846/26994846     CRandomMersenne::IRandomX(int, int) [18]
+                0.12    0.00   85337/85337       get_star_range_upper_cell_left(int) [29]
+-----------------------------------------------
+                0.00    0.00   85337/81379682     get_star_range_upper_cell_left(int) [29]
+                0.01    0.00  280607/81379682     wrap_around_function(float, float, float, float) [4]
+                0.31    0.12 13497423/81379682     CRandomMersenne::IRandomX(int, int) [18]
+                0.31    0.12 13497423/81379682     get_star_range_lower_cell_left(int) [20]
+                0.31    0.12 13526623/81379682     main [2]
+                0.93    0.35 40492269/81379682     create_subsections() [9]
+[10]     2.4    1.87    0.70 81379682         CRandomMersenne::IRandom(int, int) [10]
+                0.70    0.00 81379682/81379719     CRandomMersenne::BRandom() [16]
+-----------------------------------------------
+                0.79    0.44 26994846/26994846     generate_birth_date(float, float) [8]
+[11]     1.2    0.79    0.44 26994846         SFR_136Gyr(double) [11]
+                0.44    0.00 26994846/26994846     SFR_10Gyr(double) [21]
+-----------------------------------------------
+                1.13    0.00 26994846/26994846     generate_birth_date(float, float) [8]
+[12]     1.1    1.13    0.00 26994846         SFR_6Gyr(double) [12]
+-----------------------------------------------
+                0.99    0.00 26994846/26994846     generate_birth_date(float, float) [8]
+[13]     0.9    0.99    0.00 26994846         evalfpoly(int, double, double*) [13]
+-----------------------------------------------
+                0.87    0.00 26994846/26994846     generate_birth_date(float, float) [8]
+[14]     0.8    0.87    0.00 26994846         SFR_8Gyr(double) [14]
+-----------------------------------------------
+                0.76    0.00     509/509         main [2]
+[15]     0.7    0.76    0.00     509         copy_temp_into_star2(long) [15]
+-----------------------------------------------
+                0.00    0.00      37/81379719     CRandomMersenne::RandomInitByArray(unsigned int*, int) [34]
+                0.70    0.00 81379682/81379719     CRandomMersenne::IRandom(int, int) [10]
+[16]     0.7    0.70    0.00 81379719         CRandomMersenne::BRandom() [16]
+-----------------------------------------------
+                0.64    0.00 26994846/26994846     generate_birth_date(float, float) [8]
+[17]     0.6    0.64    0.00 26994846         SFR_12Gyr(double) [17]
+-----------------------------------------------
+                0.20    0.43 26994846/26994846     create_subsections() [9]
+[18]     0.6    0.20    0.43 26994846         CRandomMersenne::IRandomX(int, int) [18]
+                0.31    0.12 13497423/81379682     CRandomMersenne::IRandom(int, int) [10]
+-----------------------------------------------
+                0.49    0.00     510/510         main [2]
+[19]     0.5    0.49    0.00     510         copy_star2_into_star1(long) [19]
+-----------------------------------------------
+                             13497423             get_star_range_lower_cell_left(int) [20]
+                0.04    0.43 13497423/13497423     main [2]
+[20]     0.4    0.04    0.43 13497423+13497423 get_star_range_lower_cell_left(int) [20]
+                0.31    0.12 13497423/81379682     CRandomMersenne::IRandom(int, int) [10]
+                             13497423             get_star_range_lower_cell_left(int) [20]
+-----------------------------------------------
+                0.44    0.00 26994846/26994846     SFR_136Gyr(double) [11]
+[21]     0.4    0.44    0.00 26994846         SFR_10Gyr(double) [21]
+-----------------------------------------------
+                0.42    0.01 73674353/73674353     process_SN() [3]
+[22]     0.4    0.42    0.01 73674353         get_star_range_lower(int) [22]
+                0.01    0.00   29493/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                0.42    0.00 73645001/73645001     process_SN() [3]
+[23]     0.4    0.42    0.00 73645001         degree_generator(float, float) [23]
+-----------------------------------------------
+                                                 <spontaneous>
+[24]     0.4    0.39    0.00                 CRandomMersenne::Random() [24]
+-----------------------------------------------
+                0.27    0.00 26994846/26994846     generate_birth_date(float, float) [8]
+[25]     0.3    0.27    0.00 26994846         SFR_4Gyr(double) [25]
+-----------------------------------------------
+                0.25    0.00       1/1           main [2]
+[26]     0.2    0.25    0.00       1         create_columns() [26]
+                0.00    0.00       1/4           _fini [43]
+-----------------------------------------------
+                0.00    0.14       1/1           main [2]
+[27]     0.1    0.00    0.14       1         process_SN_end_subsection() [27]
+                0.14    0.00       1/1           output_stats() [28]
+                0.00    0.00       4/29200       get_star_range_upper(int) [7]
+                0.00    0.00       4/339003      wrap_around_function(float, float, float, float) [4]
+-----------------------------------------------
+                0.14    0.00       1/1           process_SN_end_subsection() [27]
+[28]     0.1    0.14    0.00       1         output_stats() [28]
+-----------------------------------------------
+                0.12    0.00   85337/85337       create_subsections() [9]
+[29]     0.1    0.12    0.00   85337         get_star_range_upper_cell_left(int) [29]
+                0.00    0.00   85337/81379682     CRandomMersenne::IRandom(int, int) [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[30]     0.1    0.10    0.00                 random_star_generator_Z(float, float) [30]
+-----------------------------------------------
+                0.01    0.01   29196/29196       process_SN() [3]
+[31]     0.0    0.01    0.01   29196         get_star_range_lower_cell_right(int) [31]
+                0.01    0.00   29196/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[32]     0.0    0.00    0.01                 SN_star(float) [32]
+                0.01    0.00   29193/234506168     copy_into_star1(long) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[33]     0.0    0.00    0.00                 etext [33]
+                0.00    0.00       1/1           CRandomMersenne::RandomInitByArray(unsigned int*, int) [34]
+                0.00    0.00       2/4           _fini [43]
+                0.00    0.00       1/1           atexit [35]
+-----------------------------------------------
+                0.00    0.00       1/1           etext [33]
+[34]     0.0    0.00    0.00       1         CRandomMersenne::RandomInitByArray(unsigned int*, int) [34]
+                0.00    0.00      37/81379719     CRandomMersenne::BRandom() [16]
+                0.00    0.00       1/1           CRandomMersenne::Init0(unsigned int) [45]
+-----------------------------------------------
+                0.00    0.00       1/1           etext [33]
+[35]     0.0    0.00    0.00       1         atexit [35]
+-----------------------------------------------
+                0.00    0.00   26375/26375       main [2]
+[40]     0.0    0.00    0.00   26375         SNIa_distance(double) [40]
+-----------------------------------------------
+                0.00    0.00    2825/2825        main [2]
+[41]     0.0    0.00    0.00    2825         SFR_2Gyr(double) [41]
+-----------------------------------------------
+                0.00    0.00     511/511         main [2]
+[42]     0.0    0.00    0.00     511         print_stats() [42]
+                0.00    0.00       1/4           _fini [43]
+-----------------------------------------------
+                0.00    0.00       1/4           create_columns() [26]
+                0.00    0.00       1/4           print_stats() [42]
+                0.00    0.00       2/4           etext [33]
+[43]     0.0    0.00    0.00       4         _fini [43]
+-----------------------------------------------
+                0.00    0.00       1/1           main [2]
+[44]     0.0    0.00    0.00       1         copy_into_star2(long) [44]
+-----------------------------------------------
+                0.00    0.00       1/1           CRandomMersenne::RandomInitByArray(unsigned int*, int) [34]
+[45]     0.0    0.00    0.00       1         CRandomMersenne::Init0(unsigned int) [45]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [11] SFR_136Gyr(double)      [7] get_star_range_upper(int) [14] SFR_8Gyr(double)
+   [3] process_SN()            [4] wrap_around_function(float, float, float, float) [21] SFR_10Gyr(double)
+  [42] print_stats()          [19] copy_star2_into_star1(long) [17] SFR_12Gyr(double)
+  [28] output_stats()          [6] random_star_generator_R(float, float, float, float) [13] evalfpoly(int, double, double*)
+  [40] SNIa_distance(double)  [30] random_star_generator_Z(float, float) [34] CRandomMersenne::RandomInitByArray(unsigned int*, int)
+  [26] create_columns()       [27] process_SN_end_subsection() [45] CRandomMersenne::Init0(unsigned int)
+   [1] copy_into_star1(long)  [20] get_star_range_lower_cell_left(int) [24] CRandomMersenne::Random()
+  [44] copy_into_star2(long)  [29] get_star_range_upper_cell_left(int) [16] CRandomMersenne::BRandom()
+  [23] degree_generator(float, float) [31] get_star_range_lower_cell_right(int) [10] CRandomMersenne::IRandom(int, int)
+   [9] create_subsections()    [5] get_star_range_upper_cell_right(int) [18] CRandomMersenne::IRandomX(int, int)
+   [8] generate_birth_date(float, float) [41] SFR_2Gyr(double) [43] _fini
+  [15] copy_temp_into_star2(long) [25] SFR_4Gyr(double)   [35] atexit
+  [22] get_star_range_lower(int) [12] SFR_6Gyr(double)     [2] main

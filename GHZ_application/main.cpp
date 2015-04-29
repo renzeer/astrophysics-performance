@@ -295,19 +295,21 @@ int main(int argc, char *argv[]) {
     cout <<"\n";
     
         
-    // 432 Declare loop variables
-    int l, k;
-    long int j;
-
-    for (l=1; l<=count_xy_glbl; l++) {
+    //#pragma omp parallel num_threads(4)
+    //{
+    //#pragma omp for nowait schedule(static)
+    //#pragma omp parallel for schedule(static) num_threads(4)
+    for (int l=1; l<=count_xy_glbl; l++) {
         star = new star_cell [column_array[l]->num_stars+1];
 
         // 432 - Loop 2 - column_array[l]->cell_max
         //loop that iterates through each cell in the column
-        for (j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++) {
+        //#pragma omp parallel for schedule(static) num_threads(4)
+        for (long int j=column_array[l]->cell_min; j<=column_array[l]->cell_max; j++) {
 
             // 432 - Loop 3 - subsect_ptr[j]->num_stars
-            for (k=1; k<=subsect_ptr[j]->num_stars; k++) {
+            //#pragma omp parallel for schedule(static) num_threads(4)
+            for (int k=1; k<=subsect_ptr[j]->num_stars; k++) {
                 //cout <<"THREAD: "<<omp_get_thread_num();
                 //cout <<"\n";
 
@@ -334,6 +336,7 @@ int main(int argc, char *argv[]) {
                 star[count].birth_date=generate_birth_date((R/1000),rg.Random());            
                 star[count].ms_lifetime=generate_ms_lifetime(star[count].mass);
                 star[count].death_date=star[count].birth_date+star[count].ms_lifetime;
+                
 
                 
 
@@ -459,6 +462,7 @@ int main(int argc, char *argv[]) {
         
         count=1;
     }// 432 - end of Loop 1
+    //}// end of pragma omp parallel
 
     cout << "\n number stars: "<<num_stars_glbl;
     cout << "\n number of SNII: "<<num_sn_glbl;
@@ -467,7 +471,6 @@ int main(int argc, char *argv[]) {
     cout << "\n Sterilization distance multiplier: "<<ster_dist_multi;
     cout << "\n Number density type: "<<number_density_type;
     cout << "\n";
-
 
     output_stats();
   
@@ -489,21 +492,23 @@ int main(int argc, char *argv[]) {
 
 void process_SN_end_subsection()
 {
-    float sn_x, sn_y, sn_z;
-    float distance;
-    float distance2;
-    float sn2=typeII;
-    float snIa=typeIa;
-    int sn_type=0;
-    int wrap_flag;
-    float sterilization_distance;
-    float birthdate_sn=0;
-    float birthdate_candidate=0;
-    float deathdate_sn=0;
-    float deathdate_candidate=0;
-    float max_time_fn=max_time;
-    int normal_ster_flag=0;
-    int wrap_ster_flag=0;
+    
+    //float sn_x, sn_y, sn_z;
+    //float distance;
+    //float distance2;
+    //float sn2=typeII;
+    //float snIa=typeIa;
+    //int sn_type=0;
+    //int wrap_flag;
+    //float sterilization_distance;
+    //float birthdate_sn=0;
+    //float birthdate_candidate=0;
+    //float deathdate_sn=0;
+    //float deathdate_candidate=0;
+    //float max_time_fn=max_time;
+    //int normal_ster_flag=0;
+    //int wrap_ster_flag=0;
+    
      
     //always looking for the SN as they occur in star1
     //eg 1->1, 1->2, 2->1
@@ -516,6 +521,7 @@ void process_SN_end_subsection()
     #pragma omp for nowait schedule(static)
     for (long int i=1; i<=ptr_1_range; i++)
     {  
+
         //********************************
         //1->1 on itself
         //*************************************
@@ -523,26 +529,29 @@ void process_SN_end_subsection()
         {
                               
             //set the birthdate/deathdate of the SN star
-            birthdate_sn=star1[i].birth_date;
-            deathdate_sn=star1[i].death_date;
+            //float birthdate_sn=star1[i].birth_date;
+            float deathdate_sn=star1[i].death_date;
             //sterilization distance for typeII
             //to be replaced with the distributions of distances
+            float sterilization_distance;
+            int sn_type = 0;
             if (star1[i].sn==1) {           
                 sterilization_distance=star1[i].sterilization_distance; 
                 sn_type=1;
             }          
             //sterilization distance for typeII
             //to be replaced with the distributions of distances
-            else if (star1[i].sn==2) {
+            //else if (star1[i].sn==2) {
+            else {
                 sterilization_distance=star1[i].sterilization_distance;   
                 sn_type=2;  
             }
                                             
                                    
-            sn_x=star1[i].x_coord;
-            sn_y=star1[i].y_coord;
-            sn_z=star1[i].z_coord;
-            wrap_flag=0;
+            float sn_x=star1[i].x_coord;
+            float sn_y=star1[i].y_coord;
+            float sn_z=star1[i].z_coord;
+            int wrap_flag=0;
             if(wrap_around_function(sn_x, sn_y, sn_z,sterilization_distance)==1) {
                 wrap_flag=1;                              
             }
@@ -551,11 +560,11 @@ void process_SN_end_subsection()
             for (long int j=get_star_range_lower(i); j<=get_star_range_upper(i); j++)
             {
 
-                normal_ster_flag=0;
-                wrap_ster_flag=0;
-                birthdate_candidate=star1[j].birth_date;
-                deathdate_candidate=star1[j].death_date;
-                distance=(sqrt
+                int normal_ster_flag=0;
+                int wrap_ster_flag=0;
+                float birthdate_candidate=star1[j].birth_date;
+                float deathdate_candidate=star1[j].death_date;
+                float distance=(sqrt
                 (
                 ((sn_x-star1[j].x_coord)*(sn_x-star1[j].x_coord))+
                 ((sn_y-star1[j].y_coord)*(sn_y-star1[j].y_coord))+
@@ -563,6 +572,7 @@ void process_SN_end_subsection()
                 ));
                                       
                 //wrap around distance
+                float distance2;
                 if (wrap_flag==1) {
                     distance2=(sqrt
                    (
@@ -574,13 +584,15 @@ void process_SN_end_subsection()
                 }
                                       
                 //normal sterilization
+                float max_time_fn=max_time;
                 if((distance<=sterilization_distance) && (birthdate_candidate<deathdate_sn) && (deathdate_candidate > deathdate_sn)
                     && (deathdate_sn <=max_time_fn))
                 {
                     if (sn_type==1) {
                         star1[j].sterilized=1;  
                     }
-                    else if (sn_type==2) {
+                    //else if (sn_type==2) {
+                    else {
                         star1[j].sterilized=2;  
                     }
 
@@ -597,7 +609,8 @@ void process_SN_end_subsection()
                     if (sn_type==1) {
                         star1[j].sterilized=1;  
                     }
-                    else if (sn_type==2) {
+                    //else if (sn_type==2) {
+                    else {
                         star1[j].sterilized=2;  
                     } 
 
@@ -611,7 +624,8 @@ void process_SN_end_subsection()
                         star1[j].sterilized_count++;
                         total_sterilizations_II++;
                     }           
-                    else if (sn_type==2) {    
+                    //else if (sn_type==2) {
+                    else {
                         total_sterilizations_Ia++;
                     } 
                 }  
@@ -665,7 +679,8 @@ void process_SN()
                 }          
                 //sterilization distance for typeII
                 //to be replaced with the distributions of distances
-                else if (star1[i].sn==2) {
+                //else if (star1[i].sn==2) {
+                else {
                     sterilization_distance=star1[i].sterilization_distance;   
                     sn_type=2;  
                 }
@@ -723,7 +738,8 @@ void process_SN()
                         if (sn_type==1) {
                             star1[j].sterilized=1;  
                         }
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star1[j].sterilized=2;  
                         }
 
@@ -739,8 +755,9 @@ void process_SN()
                         if (sn_type==1) {
                             star1[j].sterilized=1;
                         }
-                        else if (sn_type==2) {
-                        star1[j].sterilized=2;  
+                        //else if (sn_type==2) {
+                        else {
+                            star1[j].sterilized=2;  
                         }
 
                         star1[j].sterilization_date=deathdate_sn;
@@ -756,7 +773,8 @@ void process_SN()
                             star1[j].sterilized_count++;
                             total_sterilizations_II++;
                         }           
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star1[j].sterilized_count++; 
                             total_sterilizations_Ia++;
                         } 
@@ -808,7 +826,8 @@ void process_SN()
                         if (sn_type==1) {
                             star2[k].sterilized=1;  
                         }
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star2[k].sterilized=2;  
                         }
                         star2[k].sterilization_date=deathdate_sn;
@@ -839,7 +858,8 @@ void process_SN()
                         if (sn_type==1) {
                             star2[k].sterilized=1;  
                         }
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star2[k].sterilized=2;  
                         }
                         star2[k].sterilization_date=deathdate_sn;
@@ -855,7 +875,8 @@ void process_SN()
                             star2[k].sterilized_count++;
                             total_sterilizations_II++;
                         }           
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star2[k].sterilized_count++;  
                             total_sterilizations_Ia++;
                         } 
@@ -887,7 +908,8 @@ void process_SN()
                 }          
                 //sterilization distance for typeII
                 //to be replaced with the distributions of distances
-                else if (star2[l].sn==2) {
+                //else if (star2[l].sn==2) {
+                else {
                     sterilization_distance=star2[l].sterilization_distance;   
                     sn_type=2;  
                 }       
@@ -933,7 +955,8 @@ void process_SN()
                         if (sn_type==1) {
                             star1[m].sterilized=1;  
                         }
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star1[m].sterilized=2;   
                         }
 
@@ -949,7 +972,8 @@ void process_SN()
                         if (sn_type==1) {
                             star1[m].sterilized=1;   
                         }
-                        else if (sn_type==2) {
+                        //else if (sn_type==2) {
+                        else {
                             star1[m].sterilized=2;   
                         }
 
@@ -969,7 +993,8 @@ void process_SN()
                             //update_SN_sterilization_history(m,0,1);
                             total_sterilizations_II++;
                         }           
-                        else if (sn_type==2) {   
+                        //else if (sn_type==2) {   
+                        else {
                             star1[m].sterilized_count++;    
                             //update_sterilization_history(m,0,deathdate_sn);
                             //update_SN_sterilization_history(m,0,2);

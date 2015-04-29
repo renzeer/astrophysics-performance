@@ -1,0 +1,507 @@
+Environment
+	Ubuntu 14.04 running on VMWare
+
+Original, no changes 
+	Elapsed time: 116.90 seconds
+	Elapsed time: 116.55 seconds
+
+V0 Observations
+	Working from topmost level and finding obvious methods for improvement
+	Looking at main()
+		Nested for loop structure with 3 levels (Loop1, Loop2, Loop3)
+		Use OpenMP to parallelize loops
+
+V1.0, Loop3 parallelized with OpenMP 
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 116.62 seconds
+	Elapsed time: 116.73 seconds
+
+V1.1, Loop3 and Loop2 parallelized with OpenMP
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 114.73 seconds
+	Elapsed time: 118.51 seconds
+	Elapsed time: 115.07 seconds
+
+V1.2, All loops parallelized with OpenMP
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 115.31 seconds
+	Elapsed time: 121.82 seconds
+
+V1.3 Enclose loop block into 'omp parallel'
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 124.53 seconds
+	Elapsed time: 116.99 seconds
+
+V1.4 Switching scheduling of Loop 1 to dynamic
+	number stars: 13497423
+ 	number of SNII: 26344
+ 	number of SNIa: 2825
+ 	total stellar mass: 3833250.74163964
+ 	Sterilization distance multiplier: 1
+ 	Number density type: 1
+
+	Elapsed time: 125.94 seconds
+	Elapsed time: 120.20 seconds
+
+V1.5 Switching scheduling for all loops to dynamic
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 116.60 seconds
+	Elapsed time: 115.89 seconds
+
+V1.6 Remove omp from inner loops
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.74163964
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 115.69 seconds
+	Elapsed time: 123.38 seconds
+
+V1.7 Suspicious of no improvements, attempt to check if omp is functioning properly by calling omp_get_thread_num()
+	Compile error
+	Could not find omp_get_thread_num()
+	OpenMP library not properly loading
+
+V1.8 Added -fopenmp flag to compiler
+	Runtime error
+	Threads now properly print but segmentation fault immediately after
+	Through debugging, was able to pinpoint problem to 'omp parallel' block
+	Limiting threads to 2 and removing omp parallel parameters in an attempt to debug
+
+V1.9 Stripped down omp blocks to single 'omp parallel for' on loop3 with specific parameters
+	Ran into too many issues with omp, so backtracked to simplest state to work from ground up
+	Have to use static scheduling
+	Have to use ordering at second if block (unsure why)
+	Still no performance gains, but at least compiles
+	Will commit to git at this point before moving on
+
+V1.10
+	Unable to get working, running into too many issues
+	Decided to rethink approach
+
+V1 SUMMARY
+	No improvements at all through OpenMP. Much harder than expected. Loops are complex and cannot be tackled with simple omp blocks. Much more tweaking to do and hopefully we will see results. Next step is to go for easier methods of improvement such as compile optimizations
+
+===================
+
+V2.0 O0 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 54.94 seconds
+
+	Huge improvement, performance increase of about factor 2
+
+V2.1 O1 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 55.28 seconds
+
+	No improvement from flag 0
+
+V2.2 O2 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 48.67 seconds
+
+	Slight improvement from flag 0 and 1
+
+V2.3 O3 optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.76781443
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 39.86 seconds
+
+	Noticable improvements from previous flags
+	Overall performance gain now at factor 3
+
+V2.4 Ofast optimization flag
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 37.87 seconds
+
+	Very slight performance gain over previous flags
+
+V2 SUMMARY
+ foo
+====================
+Observations
+	Profiling with gprof and running_total
+		Used gprof to profile original application
+			Found that it sends a lot of time in running_total
+			Took a better look at the gprof output and found that although the function has a long cumulative runtime, the time spent inside the actual function is actually reall short. The time stacks up due to the large amount calls made to the function. Parallelzing the loop inside running_total would be useless since it is so fast already. In fact, it adds overhead, causing a slowdown. I added an omp parallel for section within running_total to test this out and th eprogram became unbearably slow.
+		Used gprof to profile V1
+			No differences from original application
+		Used gprof to profile V2
+			running_total is no longer listed in the output
+			get_star_range function family and process_SN are now the leaders in runtime
+			No for loops within get_star_range function family
+			Multiple loops within process_SN
+			Will attempt to apply omp to loops within process_SN
+
+V3.1 Apply 'omp parallel for' to loop 1.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 35.02 seconds
+	Elapsed time: 35.05 seconds
+	Elapsed time: 35.74 seconds
+
+	Very slight improvement
+
+V3.2 Apply 'omp parallel for' to loops 1.1 and 1.2 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 34.34 seconds
+	Elapsed time: 34.06 seconds
+
+	Very slight improvement
+
+V3.3 Apply 'omp parallel for' to loops 1.1, 1.2, and 2.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 33.30 seconds
+	Elapsed time: 31.55 seconds
+	Elapsed time: 32.90 seconds
+
+	More slight improvements
+
+V3.4 Apply 'omp parallel for' to loops 1, 1.1, 1.2, and 2.1 within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 27.13 seconds
+	Elapsed time: 26.77 seconds
+
+	Slightly larger improvements than previous versions
+
+V3.5 Apply 'omp parallel for' to all loops within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 24.41 seconds
+	Elapsed time: 23.82 seconds
+
+	Slight improvements
+
+V3.6 Apply 'omp parallel for' to outer loops (1 and 2) within process_SN
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 35.55 seconds
+
+	Lost fair amount of performance, rolling back to V3.5
+
+V3.7 Changed scheduling to static for all loop
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 18.03 seconds
+	Elapsed time: 18.33 seconds
+
+	Huge improvement
+
+V3.8 Changed outer loops (1 and 2) to nowait
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.40 seconds
+	Elapsed time: 17.66 seconds
+
+	Slight improvement
+
+V3 SUMMARY
+	foo
+
+===================
+Observations
+Profiling revealed that generate_birth_date() and process_SN_end_subsection() have room for improvement
+
+V4.0 Apply omp to generate_birth_date() loops
+	Causes extreme slowdown
+	Loops are small (0..7) and omp overhead not worth it
+
+V4.1 Apply omp to process_SN_end_subsection() loops
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.09 seconds
+	Elapsed time: 17.01 seconds
+
+V4.2 Manual optimization of generate_birth_date() - if,elseif,else
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.91 seconds
+	Elapsed time: 16.98 seconds
+	Elapsed time: 16.91 seconds
+
+	Slight improvement by rewriting if statements within generate_birth_date() into a if,elseif,else block
+
+V4.3 Manual optimization of generate_birth_date() - loop2 - rewrite && statement as two if statements
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.45 seconds
+	Elapsed time: 17.10 seconds
+	Elapsed time: 16.91 seconds
+	Elapsed time: 16.38 seconds
+	Elapsed time: 17.08 seconds
+	Elapsed time: 16.87 seconds
+
+	Hard to determine if there was an improvement.
+
+V4.4 Manual optimization of generate_birth_date()  - loop2 - rewrite && statement with reversed conditions
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.67 seconds
+	Elapsed time: 17.11 seconds
+	Elapsed time: 17.92 seconds
+	Elapsed time: 17.24 seconds
+
+	Loss of performance. Was hoping to trigger shortcircuits
+
+V4.4 Manual optimization of generate_birth_date() - loop2 - two if statements and reorder
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.13 seconds
+	Elapsed time: 17.25 seconds
+	Elapsed time: 17.26 seconds
+
+	Losing more performance, going back to original if statement
+
+V4.5 Manual optimization of generate_birth_date() - loop2 - decrement instead of increment iteration
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.08 seconds
+	Elapsed time: 16.60 seconds
+	Elapsed time: 17.67 seconds
+
+	No gains
+
+V4.6 Manual optimization of process_SN_end_subsection() - remove redundant else if check
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.77 seconds
+	Elapsed time: 16.31 seconds
+	Elapsed time: 16.36 seconds
+	Elapsed time: 16.97 seconds
+	Elapsed time: 16.90 seconds
+
+	Slight gain. Notice same redundant checks in process_SN()
+
+V4.7 Manual optimization of process_SN() - remove redundant else if check
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.25 seconds
+	Elapsed time: 16.63 seconds
+	Elapsed time: 16.58 seconds
+	Elapsed time: 16.94 seconds
+
+	Very difficult to tell if there is an improvement
+
+	Benchmark
+		V4.5
+			Elapsed time: 16.80 seconds
+			Elapsed time: 17.39 seconds
+			Elapsed time: 17.42 seconds
+			Elapsed time: 17.00 seconds
+			Elapsed time: 16.90 seconds
+			Elapsed time: 17.82 seconds
+			Elapsed time: 17.04 seconds
+			Elapsed time: 17.03 seconds
+		V4.7
+			Elapsed time: 17.78 seconds
+			Elapsed time: 16.76 seconds
+			Elapsed time: 16.60 seconds
+			Elapsed time: 17.39 seconds
+			Elapsed time: 16.79 seconds
+			Elapsed time: 16.93 seconds
+			Elapsed time: 16.81 seconds
+			Elapsed time: 17.05 seconds
+		Observations
+			Very slight performance gain after 8 runs. In any case, no performance loss. Will keep version 4.7
+
+V4 SUMMARY
+Changes in runtime performance are getting smaller and harder to observe. Manual optimization is also highly susceptible to errors causing broken code. Will only get harder from here with even smaller and more discrete changes to the code
+
+=============================
+
+V5.0 Manual optimization of process_SN_end_subsection() - rewrote variable declarations to be within immediate scope
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 15.98 seconds
+	Elapsed time: 16.23 seconds
+	Elapsed time: 16.05 seconds
+	Elapsed time: 16.99 seconds
+	Elapsed time: 16.28 seconds
+	Elapsed time: 16.43 seconds
+	Elapsed time: 16.55 seconds
+
+	Very slight improvement
+
+V5.1 Manual optimization of process_SN() - rewrote variable declarations to be within immediate scope
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 18.06 seconds
+	Elapsed time: 18.12 seconds
+	Elapsed time: 18.22 seconds
+
+	Noticable performance loss. Reverting to V5.0
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+

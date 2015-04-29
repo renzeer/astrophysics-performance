@@ -321,5 +321,227 @@ V4.1 Apply omp to process_SN_end_subsection() loops
 	Elapsed time: 17.09 seconds
 	Elapsed time: 17.01 seconds
 
+V4.2 Manual optimization of generate_birth_date() - if,elseif,else
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.91 seconds
+	Elapsed time: 16.98 seconds
+	Elapsed time: 16.91 seconds
+
+	Slight improvement by rewriting if statements within generate_birth_date() into a if,elseif,else block
+
+V4.3 Manual optimization of generate_birth_date() - loop2 - rewrite && statement as two if statements
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.45 seconds
+	Elapsed time: 17.10 seconds
+	Elapsed time: 16.91 seconds
+	Elapsed time: 16.38 seconds
+	Elapsed time: 17.08 seconds
+	Elapsed time: 16.87 seconds
+
+	Hard to determine if there was an improvement.
+
+V4.4 Manual optimization of generate_birth_date()  - loop2 - rewrite && statement with reversed conditions
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.67 seconds
+	Elapsed time: 17.11 seconds
+	Elapsed time: 17.92 seconds
+	Elapsed time: 17.24 seconds
+
+	Loss of performance. Was hoping to trigger shortcircuits
+
+V4.4 Manual optimization of generate_birth_date() - loop2 - two if statements and reorder
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.13 seconds
+	Elapsed time: 17.25 seconds
+	Elapsed time: 17.26 seconds
+
+	Losing more performance, going back to original if statement
+
+V4.5 Manual optimization of generate_birth_date() - loop2 - decrement instead of increment iteration
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 17.08 seconds
+	Elapsed time: 16.60 seconds
+	Elapsed time: 17.67 seconds
+
+	No gains
+
+V4.6 Manual optimization of process_SN_end_subsection() - remove redundant else if check
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.77 seconds
+	Elapsed time: 16.31 seconds
+	Elapsed time: 16.36 seconds
+	Elapsed time: 16.97 seconds
+	Elapsed time: 16.90 seconds
+
+	Slight gain. Notice same redundant checks in process_SN()
+
+V4.7 Manual optimization of process_SN() - remove redundant else if check
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.25 seconds
+	Elapsed time: 16.63 seconds
+	Elapsed time: 16.58 seconds
+	Elapsed time: 16.94 seconds
+
+	Very difficult to tell if there is an improvement
+
+	Benchmark
+		V4.5
+			Elapsed time: 16.80 seconds
+			Elapsed time: 17.39 seconds
+			Elapsed time: 17.42 seconds
+			Elapsed time: 17.00 seconds
+			Elapsed time: 16.90 seconds
+			Elapsed time: 17.82 seconds
+			Elapsed time: 17.04 seconds
+			Elapsed time: 17.03 seconds
+		V4.7
+			Elapsed time: 17.78 seconds
+			Elapsed time: 16.76 seconds
+			Elapsed time: 16.60 seconds
+			Elapsed time: 17.39 seconds
+			Elapsed time: 16.79 seconds
+			Elapsed time: 16.93 seconds
+			Elapsed time: 16.81 seconds
+			Elapsed time: 17.05 seconds
+		Observations
+			Very slight performance gain after 8 runs. In any case, no performance loss. Will keep version 4.7
+
+V4 SUMMARY
+Changes in runtime performance are getting smaller and harder to observe. Manual optimization is also highly susceptible to errors causing broken code. Will only get harder from here with even smaller and more discrete changes to the code
+
+=============================
+
+V5.0 Manual optimization of process_SN_end_subsection() - rewrote variable declarations to be within immediate scope
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 15.98 seconds
+	Elapsed time: 16.23 seconds
+	Elapsed time: 16.05 seconds
+	Elapsed time: 16.99 seconds
+	Elapsed time: 16.28 seconds
+	Elapsed time: 16.43 seconds
+	Elapsed time: 16.55 seconds
+
+	Very slight improvement
+
+V5.1 Manual optimization of process_SN() - rewrote variable declarations to be within immediate scope
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 18.06 seconds
+	Elapsed time: 18.12 seconds
+	Elapsed time: 18.22 seconds
+
+	Noticable performance loss. Reverting to V5.0
+
+V5.2 Manual optimization of generate_birth_date() - remove redundant calculation regarding area calculations
+	number stars: 13497423
+	number of SNII: 26344
+	number of SNIa: 2825
+	total stellar mass: 3833250.00921503
+	Sterilization distance multiplier: 1
+	Number density type: 1
+
+	Elapsed time: 16.35 seconds
+	Elapsed time: 17.41 seconds
+	Elapsed time: 17.37 seconds
+	Elapsed time: 16.96 seconds
+
+	Hard to tell, have to benchmark against 5.0
+
+	Benchmark
+		V5.0
+			Elapsed time: 17.51 seconds
+			Elapsed time: 16.09 seconds
+			Elapsed time: 17.95 seconds
+			Elapsed time: 16.86 seconds
+			Elapsed time: 15.87 seconds
+			Elapsed time: 17.59 seconds
+			Elapsed time: 17.47 seconds
+			Elapsed time: 16.41 seconds
+		V5.2
+			Elapsed time: 16.11 seconds
+			Elapsed time: 16.35 seconds
+			Elapsed time: 15.70 seconds
+			Elapsed time: 15.88 seconds
+			Elapsed time: 16.26 seconds
+			Elapsed time: 15.83 seconds
+			Elapsed time: 15.87 seconds
+			Elapsed time: 16.40 seconds
+		Observations
+			A more controlled environment with stricter testing shows a slight yet distinct improvement. Will keep changes
+
+V5.3
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
 
 
